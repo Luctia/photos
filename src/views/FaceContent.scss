@@ -39,10 +39,20 @@
 		}
 
 		&__title {
+			display: flex;
+			align-items: center;
+			gap: 8px;
 			margin-inline-start: 10px;
 			h2 {
 				margin-bottom: 0;
 			}
+		}
+
+		&__contact {
+			display: inline-flex;
+			align-items: center;
+			gap: 4px;
+			color: var(--color-text-maxcontrast);
 		}
 
 		&__loader {

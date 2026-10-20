@@ -4,6 +4,7 @@
  */
 
 import type { Collection } from '../services/collectionFetcher.ts'
+import type { FaceContactLink } from '../services/recognizeContacts.ts'
 import type { PhotoFile } from './files.ts'
 
 import { getCurrentUser } from '@nextcloud/auth'
@@ -34,7 +35,7 @@ type FaceDetection = {
  * @param face The name of the face the detection belongs to, or `undefined` for
  *             the unassigned-faces collection.
  */
-function findFaceDetection(file: PhotoFile, face?: string): FaceDetection {
+export function findFaceDetection(file: PhotoFile, face?: string): FaceDetection {
 	const detections = ((file.attributes as Record<string, unknown>)['face-detections'] ?? []) as FaceDetection[]
 	// recognize lists unassigned faces as detections with a cluster id of -1, and
 	// names a face after its cluster title, falling back to the cluster id.
@@ -122,6 +123,20 @@ export const useFacesStore = defineStore('faces', () => {
 	 */
 	function setUnassignedFilesCount(count: number): void {
 		unassignedFilesCount.value = count
+	}
+
+	/**
+	 * Remember which contact a face is linked to, the way the WebDAV listing reports it.
+	 *
+	 * @param faceName - Face the link belongs to
+	 * @param link - The contact and who linked it
+	 */
+	function setFaceContact(faceName: string, link: FaceContactLink): void {
+		const face = faces.value[faceName]
+		if (face === undefined) {
+			return
+		}
+		face.attributes['face-contact'] = JSON.stringify(link)
 	}
 
 	/**
@@ -250,6 +265,7 @@ export const useFacesStore = defineStore('faces', () => {
 		addUnassignedFiles,
 		removeUnassignedFiles,
 		setUnassignedFilesCount,
+		setFaceContact,
 		moveFilesToFace,
 		removeFilesFromFace,
 		renameFace,
